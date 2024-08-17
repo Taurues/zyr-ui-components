@@ -1,7 +1,7 @@
 import "./index.less";
 import React from "react";
 
-interface ButtonProps {
+export interface ButtonProps {
   /**
    * Is this the principal call to action on the page?
    */
@@ -27,7 +27,7 @@ interface ButtonProps {
 /**
  * 描述描述Button
  */
-export const Button = ({
+const Button = ({
   primary = false,
   size = "medium",
   backgroundColor,
@@ -46,3 +46,5 @@ export const Button = ({
     </button>
   );
 };
+
+export default Button;
