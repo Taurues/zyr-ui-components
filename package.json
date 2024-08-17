@@ -1,0 +1,25 @@
+{
+  "name": "zyr-ui-components",
+  "version": "1.0.0",
+  "description": "react-components",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Taurues/zyr-ui-components.git"
+  },
+  "keywords": [
+    "react",
+    "components",
+    "storybook",
+    "rollup"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Taurues/zyr-ui-components/issues"
+  },
+  "homepage": "https://github.com/Taurues/zyr-ui-components#readme"
+}
