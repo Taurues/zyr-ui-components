@@ -13,7 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-storybook": "storybook build",
     "sb": "storybook dev -p 6006",
-    "build": "rollup -c"
+    "build": "rimraf build/* && rollup -c"
   },
   "repository": {
     "type": "git",
@@ -68,6 +68,7 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^3.1.8",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.29.0"
+    "rollup-plugin-typescript2": "^0.29.0",
+    "rimraf": "^3.0.0"
   }
 }
