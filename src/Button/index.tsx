@@ -1,5 +1,7 @@
 import "./index.less";
 import React from "react";
+import { createNamespace } from "../utils/craeteBEM";
+import cn from "classnames";
 
 export interface ButtonProps {
   /**
@@ -24,6 +26,8 @@ export interface ButtonProps {
   onClick?: () => void;
 }
 
+const bem = createNamespace("button");
+
 /**
  * 描述描述Button
  */
@@ -34,11 +38,11 @@ const Button = ({
   label,
   ...props
 }: ButtonProps) => {
-  const mode = primary ? "wsf-button--primary" : "secondary";
+  const mode = primary ? bem.m("primary") : bem.m("secondary");
   return (
     <button
       type="button"
-      className={`wsf-button  ${mode} wsf-button--${size}`}
+      className={cn("z-button", mode, bem.m(size))}
       style={{ backgroundColor }}
       {...props}
     >

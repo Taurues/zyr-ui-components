@@ -1,3 +1,5 @@
+import "antd/dist/antd.css";
+
 export type { ButtonProps } from "./Button";
 export { default as Button } from "./Button";
 export type { InputProps } from "./Input";
