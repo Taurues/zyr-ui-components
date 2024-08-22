@@ -8,6 +8,18 @@ const config: StorybookConfig = {
     "@storybook/addon-essentials",
     "@storybook/addon-onboarding",
     "@storybook/addon-interactions",
+    {
+      name: "@storybook/addon-storysource",
+      options: {
+        rule: {
+          // test: [/\.stories\.jsx?$/], This is default
+          include: [path.resolve(__dirname, "../src")],
+        },
+        loaderOptions: {
+          prettierConfig: { printWidth: 80, singleQuote: false },
+        },
+      },
+    },
   ],
   framework: {
     name: "@storybook/react-webpack5",

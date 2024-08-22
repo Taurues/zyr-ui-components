@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/Taurues/zyr-ui-components#readme",
   "dependencies": {
+    "@storybook/addon-storysource": "^7.6.10",
     "@types/react": "^17.0.1",
     "@types/react-dom": "^17.0.1",
     "antd": "^4.24.12",

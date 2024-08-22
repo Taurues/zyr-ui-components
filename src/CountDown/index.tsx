@@ -1,23 +1,23 @@
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ReactNode, useMemo } from "react";
+import "./index.less";
 
+/**
+ * CountDown 参数/方法
+ */
 export interface CountDownProps {
   /**
    * 时间差毫秒数
    */
-  temp: number;
+  value: number;
+  /**
+   * 倒计时格式
+   */
+  format?: string;
   /**
    * 倒计时前缀
    */
   prefixText?: string;
-  /**
-   * 倒计时展示维度
-   * d: 天
-   * h: 小时
-   * m: 分钟
-   * s: 秒
-   */
-  type?: "d" | "h" | "m" | "s";
   /**
    * 字体颜色
    */
@@ -30,26 +30,62 @@ export interface CountDownProps {
    * 倒计时结束回调
    */
   onEnd?: () => void;
+  /**
+   * 倒计时变化时回调
+   */
+  onChange?: (value: number) => void;
+  /**
+   * 自定义展示：允许传入node，自定义展示时间格式
+   */
+  children?: ReactNode | ((remaining: CurrentTime) => ReactNode);
 }
+
+/**
+ * CurrentTime 类型
+ */
+export interface CurrentTime {
+  /**
+   * 天
+   */
+  days: number;
+  /**
+   * 时
+   */
+  hours: number;
+  /**
+   * 分
+   */
+  minutes: number;
+  /**
+   * 秒
+   */
+  seconds: number;
+}
+
 const CountDown = ({
-  temp,
+  value,
+  format = "d天HH小时mm分ss秒",
   prefixText,
   style,
-  type = "s",
   color,
   onEnd,
+  onChange,
+  children,
 }: CountDownProps) => {
-  const [remaining, setRemaining] = useState(calculateRemainingTime(temp));
+  const [remaining, setRemaining] = useState<CurrentTime>(
+    calculateRemainingTime(value)
+  );
 
   useEffect(() => {
-    if (temp <= 0) {
+    if (value <= 0) {
       return setRemaining(calculateRemainingTime(0));
     }
     const intervalId = setInterval(() => {
-      temp = temp - 1000;
-      setRemaining(calculateRemainingTime(temp));
-      if (temp <= 0) {
-        temp = 0;
+      value = value - 1000;
+      setRemaining(calculateRemainingTime(value));
+      onChange && onChange(value);
+      if (value <= 0) {
+        value = 0;
         onEnd && onEnd();
         clearInterval(intervalId);
         return;
@@ -60,7 +96,7 @@ const CountDown = ({
     return () => {
       return clearInterval(intervalId);
     };
-  }, [temp]);
+  }, [value]);
 
   function calculateRemainingTime(temp) {
     const duration = moment.duration(temp);
@@ -82,41 +118,26 @@ const CountDown = ({
   const minuteRender = () => <span>{pad(remaining.minutes)}分</span>;
   const secondRender = () => <span>{pad(remaining.seconds)}秒</span>;
 
-  const renderSpan = (type) => {
-    switch (type) {
-      case "d":
-        return dayRender();
-      case "h":
-        return (
-          <>
-            {dayRender()}
-            {hourRender()}
-          </>
-        );
-      case "m":
-        return (
-          <>
-            {dayRender()}
-            {hourRender()}
-            {minuteRender()}
-          </>
-        );
-      case "s":
-        return (
-          <>
-            {Math.floor(remaining.days) > 0 && dayRender()}
-            {hourRender()}
-            {minuteRender()}
-            {secondRender()}
-          </>
-        );
-      default:
-        return "-";
+  // 默认渲染
+  const defaultRender = () => (
+    <>
+      {dayRender()}
+      {hourRender()}
+      {minuteRender()}
+      {secondRender()}
+    </>
+  );
+
+  const renderSpan = useMemo(() => {
+    if (typeof children === "function") {
+      return children(remaining);
     }
-  };
+    if (children) return children;
+    return defaultRender();
+  }, [children, remaining]);
 
   return (
-    <span
+    <div
       className="count-down"
       style={{
         color,
@@ -124,8 +145,8 @@ const CountDown = ({
       }}
     >
       {prefixText && <span style={{ marginRight: 5 }}>{prefixText}</span>}
-      {renderSpan(type)}
-    </span>
+      {renderSpan}
+    </div>
   );
 };
 
