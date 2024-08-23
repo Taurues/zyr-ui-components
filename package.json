@@ -11,6 +11,8 @@
   "types": "build/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "create": "node src/serve/create.js",
+    "export": "node src/serve/export.js",
     "build-storybook": "storybook build",
     "sb": "storybook dev -p 6006",
     "build": "rimraf build/* && rollup -c"

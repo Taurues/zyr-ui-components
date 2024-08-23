@@ -58,7 +58,7 @@ export default {
       format: "es",
     },
   ],
-  external: ["antd"],
+  external: ["antd", "src/serve"],
   plugins: [
     peerDepsExternal({ includeDependencies: !isProd }),
     resolve(),
