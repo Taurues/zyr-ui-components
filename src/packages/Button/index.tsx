@@ -1,6 +1,6 @@
 import "./index.less";
 import React from "react";
-import { createNamespace } from "../../utils/craeteBEM";
+import { createNamespace } from "../../utils/createBEM";
 import cn from "classnames";
 
 export interface ButtonProps {

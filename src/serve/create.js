@@ -20,7 +20,7 @@ const createTsx = (name) => {
     import "./index.less";
     import React from "react";
     import cn from "classnames";
-    import { createNamespace } from "../../utils/craeteBEM";\n
+    import { createNamespace } from "../../utils/createBEM";\n
     export interface ${name}Props {}\n
     const bem = createNamespace("${name.toLowerCase()}");
     const ${name} = ({}: ${name}Props) => { return <div></div>}\n
