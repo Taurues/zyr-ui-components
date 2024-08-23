@@ -73,7 +73,6 @@ const create = () => {
   } catch (error) {
     spinner.fail(`${name}创建失败~~~`);
   }
-
 }
 create();
 
