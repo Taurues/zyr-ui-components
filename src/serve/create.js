@@ -9,6 +9,10 @@
  * */
 
 const fs = require('fs');
+//控制台颜色输出
+const chalk = require('chalk');
+// 加载动画
+const ora = require('ora');
 
 // index.tsx 模版
 const createTsx = (name) => {
@@ -46,21 +50,30 @@ const createLess = (name) => {
   return `.zyr-${name.toLowerCase()} {}`
 }
 
+const spinner = ora('创建文件中...')
 const create = () => {
   const name = process.argv[2];
   const path = `./src/packages/${name}`;
   if (fs.existsSync(path)) {
-    console.log('文件夹已经存在');
+    console.log(chalk.red('❌~~~文件夹已经存在~~~'));
     return;
   }
   if (!/^[A-Z][a-zA-Z]*$/.test(name)) {
-    console.log('文件夹名称不符合大驼峰命名规范');
+    console.log(chalk.red('❌~~~文件夹名称不符合大驼峰命名规范~~~'));
     return;
   }
-  fs.mkdirSync(path);
-  fs.writeFileSync(`${path}/index.tsx`, createTsx(name));
-  fs.writeFileSync(`${path}/index.stories.tsx`, createStories(name))
-  fs.writeFileSync(`${path}/index.less`, createLess(name))
+  spinner.start();
+  try {
+    fs.mkdirSync(path);
+    fs.writeFileSync(`${path}/index.tsx`, createTsx(name));
+    fs.writeFileSync(`${path}/index.stories.tsx`, createStories(name))
+    fs.writeFileSync(`${path}/index.less`, createLess(name))
+    spinner.succeed(`${name}创建成功~~~`);
+    spinner.stop()
+  } catch (error) {
+    spinner.fail(`${name}创建失败~~~`);
+  }
+
 }
 create();
 
