@@ -6,7 +6,7 @@ import { parseFormat } from "../../utils/format";
 /**
  * CountDown 参数/方法
  */
-export interface CountDownProps {
+export interface ZyrCountDownProps {
   /**
    * 时间差毫秒数
    */
@@ -71,7 +71,7 @@ export interface CurrentTime {
   milliseconds: number;
 }
 
-const CountDown = ({
+const ZyrCountDown = ({
   value,
   format = "DD天HH小时mm分ss秒",
   prefixText,
@@ -80,7 +80,7 @@ const CountDown = ({
   onEnd,
   onChange,
   children,
-}: CountDownProps) => {
+}: ZyrCountDownProps) => {
   const [remaining, setRemaining] = useState<CurrentTime>(
     calculateRemainingTime(value)
   );
@@ -146,4 +146,4 @@ const CountDown = ({
   );
 };
 
-export default CountDown;
+export default ZyrCountDown;

@@ -1,32 +1,28 @@
 {/* index.mdx */}
 
 import { Meta, Primary, Controls, Story } from "@storybook/blocks";
-import * as CountDownStories from "./index.stories";
+import * as ZyrCountDownStories from "./index.stories";
 
-<Meta of={CountDownStories} />
+<Meta of={ZyrCountDownStories} />
 
-# CountDown
+# ZyrCountDown
 
-A CountDown is ...
-
-## Props
-
-<Controls />
+倒计时组件
 
 ## Stories
 
 ### 基础使用
 
-<Story of={CountDownStories.BaseCountDown} />
+<Story of={ZyrCountDownStories.BaseCountDown} />
 ```
-<CountDown value="1000 * 60 * 60 * 12" format="HH:mm:ss" prefixText="还剩" />
+<ZyrCountDown value="1000 * 60 * 60 * 12" format="HH:mm:ss" prefixText="还剩" />
 ```
 
 ### 自定义展示
 
-<Story of={CountDownStories.CustomerCountDown} />
+<Story of={ZyrCountDownStories.CustomerCountDown} />
 ```
-<CountDown value="1000 * 60 * 60 * 12" prefixText="还剩">
+<ZyrCountDown value="1000 * 60 * 60 * 12" prefixText="还剩">
   {({ days, hours, minutes, seconds }) => (
     <div>
       <span style={{ color: "red" }}>{days}</span>天
@@ -35,5 +31,9 @@ A CountDown is ...
       <span style={{ color: "red" }}>{seconds}</span>秒
     </div>
   )}
-</CountDown>
+</ZyrCountDown>
 ```
+
+## 属性
+
+<Controls />

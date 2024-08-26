@@ -1,11 +1,11 @@
-import CountDown from "./index";
+import ZyrCountDown from "./index";
 import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta = {
-  title: "Example/CountDown",
-  component: CountDown,
+  title: "Example/ZyrCountDown",
+  component: ZyrCountDown,
   parameters: {
     layout: "centered",
   },
@@ -13,7 +13,7 @@ const meta = {
     color: { control: "color" },
   },
   // tags: ["autodocs"],
-} satisfies Meta<typeof CountDown>;
+} satisfies Meta<typeof ZyrCountDown>;
 
 export default meta;
 
