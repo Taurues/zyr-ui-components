@@ -12,7 +12,7 @@ const meta = {
   argTypes: {
     color: { control: "color" },
   },
-  tags: ["autodocs"],
+  // tags: ["autodocs"],
 } satisfies Meta<typeof CountDown>;
 
 export default meta;
@@ -25,7 +25,7 @@ export const BaseCountDown: Story = {
     value: 1000 * 60 * 60 * 12,
     prefixText: "还剩",
     color: "orange",
-    format: "D天HH:mm:ss",
+    format: "HH:mm:ss",
   },
 };
 

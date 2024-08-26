@@ -1,0 +1,39 @@
+{/* index.mdx */}
+
+import { Meta, Primary, Controls, Story } from "@storybook/blocks";
+import * as CountDownStories from "./index.stories";
+
+<Meta of={CountDownStories} />
+
+# CountDown
+
+A CountDown is ...
+
+## Props
+
+<Controls />
+
+## Stories
+
+### 基础使用
+
+<Story of={CountDownStories.BaseCountDown} />
+```
+<CountDown value="1000 * 60 * 60 * 12" format="HH:mm:ss" prefixText="还剩" />
+```
+
+### 自定义展示
+
+<Story of={CountDownStories.CustomerCountDown} />
+```
+<CountDown value="1000 * 60 * 60 * 12" prefixText="还剩">
+  {({ days, hours, minutes, seconds }) => (
+    <div>
+      <span style={{ color: "red" }}>{days}</span>天
+      <span style={{ color: "red" }}>{hours}</span>小时
+      <span style={{ color: "red" }}>{minutes}</span>分钟
+      <span style={{ color: "red" }}>{seconds}</span>秒
+    </div>
+  )}
+</CountDown>
+```
