@@ -31,7 +31,6 @@ export const Primary: Story = {
   args: {
     primary: true,
     label: "Button",
-    children: <div>123</div>,
   },
 };
 

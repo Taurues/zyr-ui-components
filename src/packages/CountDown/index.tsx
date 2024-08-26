@@ -1,6 +1,7 @@
 import moment from "moment";
 import React, { useEffect, useState, ReactNode, useMemo } from "react";
 import "./index.less";
+import { parseFormat } from "../../utils/format";
 
 /**
  * CountDown 参数/方法
@@ -45,6 +46,10 @@ export interface CountDownProps {
  */
 export interface CurrentTime {
   /**
+   * 总时间
+   */
+  total: number;
+  /**
    * 天
    */
   days: number;
@@ -60,11 +65,15 @@ export interface CurrentTime {
    * 秒
    */
   seconds: number;
+  /**
+   * 毫秒
+   */
+  milliseconds: number;
 }
 
 const CountDown = ({
   value,
-  format = "d天HH小时mm分ss秒",
+  format = "DD天HH小时mm分ss秒",
   prefixText,
   style,
   color,
@@ -102,10 +111,12 @@ const CountDown = ({
     const duration = moment.duration(temp);
 
     return {
+      total: temp,
       days: duration.days(),
       hours: duration.hours(),
       minutes: duration.minutes(),
       seconds: duration.seconds(),
+      milliseconds: duration.milliseconds(),
     };
   }
 
@@ -113,27 +124,12 @@ const CountDown = ({
     return num < 10 ? "0" + num : num;
   };
 
-  const dayRender = () => <span>{Math.floor(remaining.days)}天</span>;
-  const hourRender = () => <span>{pad(remaining.hours)}时</span>;
-  const minuteRender = () => <span>{pad(remaining.minutes)}分</span>;
-  const secondRender = () => <span>{pad(remaining.seconds)}秒</span>;
-
-  // 默认渲染
-  const defaultRender = () => (
-    <>
-      {dayRender()}
-      {hourRender()}
-      {minuteRender()}
-      {secondRender()}
-    </>
-  );
-
   const renderSpan = useMemo(() => {
     if (typeof children === "function") {
       return children(remaining);
     }
     if (children) return children;
-    return defaultRender();
+    if (format) return parseFormat(format, remaining);
   }, [children, remaining]);
 
   return (

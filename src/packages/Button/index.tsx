@@ -24,7 +24,6 @@ export interface ButtonProps {
    * 点击事件
    */
   onClick?: () => void;
-  children?: React.ReactNode;
 }
 
 const bem = createNamespace("button");
@@ -37,7 +36,6 @@ const Button = ({
   size = "medium",
   backgroundColor,
   label,
-  children,
   ...props
 }: ButtonProps) => {
   const mode = primary ? bem.m("primary") : bem.m("secondary");
@@ -49,7 +47,6 @@ const Button = ({
       {...props}
     >
       {label}
-      {children}
     </button>
   );
 };
