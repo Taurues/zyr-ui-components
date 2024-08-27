@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/Taurues/zyr-ui-components#readme",
   "dependencies": {
+    "@ant-design/icons": "^5.4.0",
     "@storybook/addon-storysource": "^7.6.10",
     "@types/react": "^17.0.1",
     "@types/react-dom": "^17.0.1",
@@ -42,7 +43,8 @@
     "lodash": "^4.17.21",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-babel": "^5.3.0",
@@ -77,8 +79,8 @@
     "ts-loader": "^6.0.4"
   },
   "peerDependencies": {
+    "antd": "^4.24.12",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "antd": "^4.24.12"
+    "react-dom": "^17.0.1"
   }
 }

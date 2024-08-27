@@ -22,7 +22,7 @@ const createTsx = (name) => {
     import cn from "classnames";
     import { createNamespace } from "../../utils/createBEM";\n
     export interface ${name}Props {}\n
-    const bem = createNamespace("${name.toLowerCase()}");
+    const bem = createNamespace("${name.toLowerCase().replace("zyr", '')}");
     const ${name} = ({}: ${name}Props) => { return <div></div>}\n
     export default ${name};
   `
@@ -47,7 +47,8 @@ const createStories = (name) => {
 `}
 // index.less 模版
 const createLess = (name) => {
-  return `.zyr-${name.toLowerCase()} {}`
+  const str = name.toLowerCase().replace("zyr", '')
+  return `.zyr-${str} {}`
 }
 
 const spinner = ora('创建文件中...')

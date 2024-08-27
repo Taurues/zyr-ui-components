@@ -1,1 +1,41 @@
-.zyr-zyrupload {}
+.zyr-upload {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  &-list {
+    margin-right: 10px;
+    &-item {
+      width: 80px;
+      height: 80px;
+      margin-right: 10px;
+    }
+  }
+  &-uploading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    box-sizing: border-box;
+    width: 80px;
+    height: 80px;
+    padding: 9px 6px;
+    color: #3388ff;
+    font-size: 12px;
+    border: 1px dashed #3388ff;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  &__input {
+    display: none;
+    width: 80px;
+    height: 80px;
+  }
+  &__paste {
+    box-sizing: border-box;
+    padding: 0px 5px;
+    text-align: center;
+    border: 1px solid #3388ff;
+    border-radius: 2px 2px 2px 2px;
+  }
+}

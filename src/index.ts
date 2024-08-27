@@ -1,3 +1,3 @@
 import "antd/dist/antd.css";
-export type { CountDownProps } from "./packages/ZyrCountDown";
-export { default as CountDown } from "./packages/ZyrCountDown";
+export type { ZyrCountDownProps } from "./packages/ZyrCountDown";
+export { default as ZyrCountDown } from "./packages/ZyrCountDown";
