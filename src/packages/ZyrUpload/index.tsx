@@ -6,6 +6,7 @@ import { message, Image } from "antd";
 import type { UploadFile } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { v4 as uuidv4 } from "uuid";
+import "../../style/icon.less";
 
 export interface ZyrUploadProps {
   /**
@@ -112,10 +113,12 @@ const ZyrUpload = ({
 
   const changeHandle = (e) => {
     const files = e.target.files;
+
     uploadFile(files);
   };
 
   const uploadFile = (files) => {
+    console.log("files :>> ", files);
     const formData = new FormData();
     formData.append("id", uuidv4());
     formData.append("file", files[0]);
@@ -136,12 +139,18 @@ const ZyrUpload = ({
     // });
   };
 
+  const removeHandle = (idx: number) => {
+    const ls = [...fileList];
+    ls.splice(idx, 1);
+    setFileList(ls);
+  };
+
   const fileRef = useRef();
 
   return (
     <div className={bem.b()}>
       <div className={`${bem.b()}-list`}>
-        {fileList.map((item) => {
+        {fileList.map((item, idx) => {
           return (
             <div key={item.id} className={`${bem.b()}-list-item`}>
               {/* 根据返回的文件类型区分 */}
@@ -151,6 +160,14 @@ const ZyrUpload = ({
                 height={80}
                 style={{ marginRight: 10 }}
               />
+              <i
+                className={cn(
+                  "iconfont",
+                  "icon-guanbi",
+                  `${bem.b()}-list-item-close`
+                )}
+                onClick={() => removeHandle(idx)}
+              ></i>
             </div>
           );
         })}

@@ -12,7 +12,7 @@ fs.readdir('./src/packages', (err, files) => {
   }
   if (Array.isArray(files)) {
     // 默认内容
-    let exportStr = `import "antd/dist/antd.css";`
+    let exportStr = `import "./style/index.less";`
     files.forEach(e => {
       // 检查是否为文件夹
       const isPackage = fs.lstatSync(`./src/packages/${e}`).isDirectory()
