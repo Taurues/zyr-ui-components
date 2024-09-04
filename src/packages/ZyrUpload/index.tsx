@@ -1,97 +1,164 @@
 import "./index.less";
-import React, { useEffect, useRef, useState } from "react";
-import cn from "classnames";
+import React, { useEffect, useRef, useState, ReactNode } from "react";
 import { createNamespace } from "../../utils/createBEM";
-import { message, Image } from "antd";
-import type { UploadFile } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { v4 as uuidv4 } from "uuid";
-import "../../style/icon.less";
+import { Button, message, Upload } from "antd";
+import type { UploadFile, UploadProps } from "antd";
+import { PlusOutlined, UploadOutlined, InboxOutlined } from "@ant-design/icons";
+// import "../../style/icon.less";
+import axios from "axios";
 
 export interface ZyrUploadProps {
   /**
-   * 是否支持粘贴上传
+   * 上传接口url
    */
-  isPaste?: boolean;
+  action?: string;
   /**
-   * 最大可上传图片大小(单位：M)
+   *设置上传的请求头部，IE10 以上有效
+   */
+  headers: { [key: string]: string };
+  /**
+   * 最大可上传单个图片、文件大小(单位：M)
    */
   maxSize?: number;
+  /**
+   * 最大可上传文件数 大于或等于maxCount，将隐藏上传按钮
+   */
+  maxCount?: number;
   /**
    * 可上传文件类型
    */
   accept?: string;
   /**
-   * 上传地址
+   * 是否支持同时上传多个文件
    */
-  action?: string;
+  multiple?: boolean;
   /**
-   * 上传前文件校验
+   * 是否支持上传文件夹
    */
-  beforeUpload: (file: File) => boolean | Promise<void> | void;
+  directory?: boolean;
+  /**
+   * 是否支持拖拽上传
+   */
+  isDrag?: boolean;
+  /**
+   * 是否支持粘贴上传
+   */
+  isPaste?: boolean;
+  /**
+   * 上传所需额外参数或返回上传额外参数的方法
+   */
+  data: { [key: string]: string };
+  /**
+   * 是否禁用
+   */
+  disabled?: boolean;
+  /**
+   *上传列表的内建样式，支持三种基本样式
+   */
+  listType: "text" | "picture" | "picture-card";
+  /**
+   *已经上传的文件列表
+   */
+  fileList?: [];
+  /**
+   * 通过覆盖默认的上传行为，可以自定义自己的上传实现
+   */
+  customRequest?: () => void;
+  /**
+   *是否展示文件列表, 可设为一个对象，用于单独设定 showPreviewIcon, showRemoveIcon, showDownloadIcon, removeIcon 和 downloadIcon
+   */
+  showUploadList?:
+    | boolean
+    | {
+        showPreviewIcon?: boolean;
+        showRemoveIcon?: boolean;
+        showDownloadIcon?: boolean;
+        previewIcon?: ReactNode | ((file: UploadFile) => ReactNode);
+        removeIcon?: ReactNode | ((file: UploadFile) => ReactNode);
+        downloadIcon?: ReactNode | ((file: UploadFile) => ReactNode);
+      };
+  /**
+   * 上传文件前触发事件
+   */
+  beforeUpload?: (file: File) => boolean | Promise<void> | void;
   /**
    * 删除已上传的文件
    */
-  onRemove: (file: UploadFile) => void | boolean | Promise<void | boolean>;
-  /**
-   * 上传成功回调
-   */
-  onSuccess: (response: any, file: UploadFile) => void;
-  /**
-   * 上传失败回调
-   */
-  onError: (error: any, file: UploadFile) => void;
-  /**
-   * 上传进度回调
-   */
-  onProgress: (event: { percent: number }, file: UploadFile) => void;
+  onRemove?: (file: UploadFile) => void | boolean | Promise<void | boolean>;
   /**
    * 上传文件改变
    */
-  onChange: (info: { file: UploadFile; fileList: UploadFile[] }) => void;
+  onChange?: (info: { file: UploadFile; fileList: UploadFile[] }) => void;
+  /**
+   *自定义内容
+   */
+  children?: ReactNode;
 }
 
 const bem = createNamespace("upload");
 
-/**
- * 没有传action 手动处理上传
- */
-
-const defaultMap = {
-  pdf: "",
-  word: "",
-  doc: "",
-  docx: "",
-  xls: "",
-  xlsx: "",
-  xlt: "",
-  excel: "",
-  bmp: "",
-  dwg: "",
-};
-
 const ZyrUpload = ({
-  isPaste = true,
   maxSize = 10,
+  maxCount = 10,
   accept,
+  multiple = false,
+  directory = false,
+  listType,
+  isDrag = false,
+  isPaste = false,
+  fileList = [],
   action,
+  data,
+  disabled = false,
+  // showUploadList = {
+  //   showPreviewIcon: true,
+  //   showRemoveIcon: true,
+  //   showDownloadIcon: true,
+  // },
   beforeUpload,
   onRemove,
-  onSuccess,
-  onError,
-  onProgress,
   onChange,
-  ...props
-}: ZyrUploadProps) => {
-  const [fileList, setFileList] = useState<{ id: string; url: string }[]>([]);
-
+  children,
+}: ZyrUploadProps & UploadProps) => {
+  const ref = useRef();
+  const [list, setList] = useState<UploadFile[]>(fileList);
   useEffect(() => {
-    isPaste && addEventListener("paste", (event) => pasteEvent(event));
-    return () => removeEventListener("paste", (event) => pasteEvent(event));
-  }, []);
+    const handlePaste = (event: ClipboardEvent) => {
+      pasteEvent(event);
+    };
+
+    isPaste && addEventListener("paste", handlePaste);
+
+    // 清理事件监听器
+    return () => {
+      removeEventListener("paste", handlePaste);
+    };
+  }, [list, isPaste]);
+
+  // file类型格式
+  const getFileObj = (file: UploadFile) => {
+    return {
+      uid: file.uid,
+      lastModified: file.lastModified,
+      lastModifiedDate: file.lastModifiedDate,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      webkitRelativePath: file.webkitRelativePath,
+    };
+  };
+
+  // 上传前校验
+  const beforeUploadHandle = (file) => {
+    if (file.size > maxSize * 1024 * 1024 && file.type.includes("image/")) {
+      message.error(`上传图片超过${maxSize}M大小限制，请重新上传`);
+      return Upload.LIST_IGNORE;
+    }
+    return true; //beforeUpload(file)
+  };
+
   // 监听粘贴事件
   const pasteEvent = (event) => {
-    let formData = new FormData();
     let blob;
     if (!(event.clipboardData && event.clipboardData.items)) {
       return;
@@ -100,93 +167,189 @@ const ZyrUpload = ({
     for (let i = 0, len = items.length; i < len; i++) {
       let itemz = items[i];
       if (itemz.kind === "file" && itemz.type.match(/^image\//i)) {
+        itemz.uid = `rc-upload-${new Date().getTime()}`;
         blob = itemz.getAsFile();
-        if (blob.size > maxSize * 1024 * 1024) {
-          return message.error(`上传图片超过${maxSize}M大小限制，请重新上传`);
+        if (beforeUploadHandle(blob) === true) {
+          Object.defineProperty(blob, "uid", {
+            value: `rc-upload-${new Date().getTime()}`,
+            writable: false,
+          });
+          uploadFile({
+            action,
+            file: blob,
+            filename: blob.name,
+            data,
+            onUploadProgress: ({ percent }, file) => {
+              const f = { ...file, originFileObj: blob };
+              const fs = updateFileList(
+                { ...file, response: data, originFileObj: blob },
+                list
+              );
+              changeHandle({
+                file: { ...file, originFileObj: blob },
+                fileList: updateFileList(
+                  { ...file, response: data, originFileObj: blob },
+                  list
+                ),
+              });
+            },
+            onSuccess: async (data, file) => {
+              changeHandle({
+                file: { ...file, originFileObj: blob },
+                fileList: updateFileList(
+                  { ...file, response: data, originFileObj: blob },
+                  list
+                ),
+              });
+            },
+            onError: (err, file) => {
+              changeHandle({
+                file: { ...file, originFileObj: blob },
+                fileList: updateFileList(
+                  { ...file, response: data, originFileObj: blob },
+                  list
+                ),
+              });
+            },
+          });
         }
-        console.log("object :>> ", items);
       } else {
         return message.error("请先截图后粘贴");
       }
     }
   };
-
-  const changeHandle = (e) => {
-    const files = e.target.files;
-
-    uploadFile(files);
+  // 更新list
+  const updateFileList = (
+    file: UploadFile,
+    filesList: (UploadFile | Readonly<UploadFile>)[]
+  ) => {
+    const nextFileList = [...filesList];
+    const fileIndex = nextFileList.findIndex(({ uid }) => uid === file.uid);
+    if (fileIndex === -1) {
+      nextFileList.push(file);
+    } else {
+      nextFileList[fileIndex] = file;
+    }
+    return nextFileList;
   };
-
-  const uploadFile = (files) => {
-    console.log("files :>> ", files);
+  // 自定义上传
+  const uploadFile = (option) => {
     const formData = new FormData();
-    formData.append("id", uuidv4());
-    formData.append("file", files[0]);
-    fetch("http://localhost:3000/upload", {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log("res :>> ", res);
-        setFileList([...fileList, res.data]);
-      })
-      .catch(() => {
-        message.error("upload failed.");
+    if (option.data) {
+      Object.keys(data).forEach((key) => {
+        formData.append(key, data[key] as string);
       });
-    // .finally(() => {
-    //   setUploading(false);
-    // });
+    }
+    formData.append("file", option.file);
+    axios
+      .post(action, formData, {
+        onUploadProgress: (res) => {
+          const { total, loaded } = res;
+          const number = Number(Math.round((loaded / total) * 100).toFixed(2));
+          const targetFile = {
+            ...getFileObj(option.file),
+            percent: number,
+            status: "uploading",
+          };
+          option.onUploadProgress &&
+            option.onUploadProgress(
+              {
+                percent: number,
+              },
+              targetFile
+            );
+        },
+      })
+      .then((res) => {
+        const { data } = res.data;
+        const tragetFile = {
+          ...getFileObj(option.file),
+          status: "done",
+          precent: 100,
+        };
+        option.onSuccess && option.onSuccess(data, tragetFile);
+      })
+      .catch((err) => {
+        const targetFile = {
+          ...getFileObj(option.file),
+          status: "error",
+          precent: 0,
+        };
+        option.onError(err, targetFile);
+      });
+
+    return {
+      abort() {
+        console.log("upload progress is aborted.");
+      },
+    };
   };
 
-  const removeHandle = (idx: number) => {
-    const ls = [...fileList];
-    ls.splice(idx, 1);
-    setFileList(ls);
-  };
+  // 拖拽默认展示样式
+  const defaultDragRender = (
+    <>
+      <p className="ant-upload-drag-icon">
+        <InboxOutlined />
+      </p>
+      <p className="ant-upload-text">文件拖入/点击/粘贴上传</p>
+    </>
+  );
 
-  const fileRef = useRef();
-
-  return (
-    <div className={bem.b()}>
-      <div className={`${bem.b()}-list`}>
-        {fileList.map((item, idx) => {
-          return (
-            <div key={item.id} className={`${bem.b()}-list-item`}>
-              {/* 根据返回的文件类型区分 */}
-              <Image
-                src={item.url}
-                width={80}
-                height={80}
-                style={{ marginRight: 10 }}
-              />
-              <i
-                className={cn(
-                  "iconfont",
-                  "icon-guanbi",
-                  `${bem.b()}-list-item-close`
-                )}
-                onClick={() => removeHandle(idx)}
-              ></i>
-            </div>
-          );
-        })}
-      </div>
-      <label htmlFor="fileInput" className={`${bem.b()}-uploading`}>
-        <PlusOutlined style={{ fontSize: 20 }} />
-        <input
-          className={bem.e("input")}
-          type="file"
-          ref={fileRef}
-          id="fileInput"
-          onChange={changeHandle}
-          accept={accept}
-          // multiple={defaultProps.multiple}
-        />
-        <span>本地上传</span>
-        {isPaste && <div className={bem.e("paste")}>粘贴图片</div>}
-      </label>
+  // 默认上传按钮样式
+  const defaultRender = children ? (
+    children
+  ) : listType !== "picture-card" ? (
+    <Button icon={<UploadOutlined />}>点击上传</Button>
+  ) : (
+    <div className={`${bem.b()}-picture`}>
+      <PlusOutlined />
+      <span>点击上传</span>
     </div>
+  );
+  const removeHandle = (file) => {
+    const ls = list.filter((t) => t.uid !== file.uid);
+    setList(ls);
+    onRemove && onRemove(file);
+  };
+
+  const changeHandle = ({ file, fileList }) => {
+    setList(fileList);
+    onChange && onChange({ file, fileList });
+  };
+
+  const defaultProps = {
+    maxCount,
+    accept,
+    multiple,
+    directory,
+    data,
+    disabled,
+    listType,
+    fileList,
+  };
+
+  return isDrag ? (
+    <Upload.Dragger
+      {...defaultProps}
+      fileList={list}
+      customRequest={uploadFile}
+      beforeUpload={beforeUploadHandle}
+      onRemove={removeHandle}
+      onChange={changeHandle}
+    >
+      {children ? children : defaultDragRender}
+    </Upload.Dragger>
+  ) : (
+    <Upload
+      {...defaultProps}
+      fileList={list}
+      customRequest={uploadFile}
+      beforeUpload={beforeUploadHandle}
+      onRemove={removeHandle}
+      onChange={changeHandle}
+    >
+      {list.length >= maxCount ? "" : defaultRender}
+    </Upload>
   );
 };
 

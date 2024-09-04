@@ -24,6 +24,10 @@ export interface ZyrCountDownProps {
    */
   color?: string;
   /**
+   * 倒计时 或 增长计时
+   */
+  type: "add" | "sub";
+  /**
    * 自定义样式
    */
   style?: React.CSSProperties;

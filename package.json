@@ -13,7 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "create": "node src/serve/create.js",
     "build-storybook": "storybook build",
-    "sb": "storybook dev -p 6006",
+    "sb": "storybook dev -p 6009",
     "prebuild": "node src/serve/export.js",
     "build": "rimraf build/* && rollup -c"
   },
@@ -39,6 +39,7 @@
     "@types/react": "^17.0.1",
     "@types/react-dom": "^17.0.1",
     "antd": "^4.24.12",
+    "axios": "^1.7.7",
     "classnames": "^2.5.1",
     "lodash": "^4.17.21",
     "react": "^17.0.1",
