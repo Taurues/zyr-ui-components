@@ -7,15 +7,19 @@ import { PlusOutlined, UploadOutlined, InboxOutlined } from "@ant-design/icons";
 // import "../../style/icon.less";
 import axios from "axios";
 
+export type UploadRequestMethod =
+  | "POST"
+  | "PUT"
+  | "PATCH"
+  | "post"
+  | "put"
+  | "patch";
+
 export interface ZyrUploadProps {
   /**
    * 上传接口url
    */
   action?: string;
-  /**
-   *设置上传的请求头部，IE10 以上有效
-   */
-  headers: { [key: string]: string };
   /**
    * 最大可上传单个图片、文件大小(单位：M)
    */
@@ -48,6 +52,14 @@ export interface ZyrUploadProps {
    * 上传所需额外参数或返回上传额外参数的方法
    */
   data: { [key: string]: string };
+  /**
+   *设置上传的请求头部，IE10 以上有效
+   */
+  headers: { [key: string]: string };
+  /**
+   * http 请求方法
+   */
+  method?: UploadRequestMethod;
   /**
    * 是否禁用
    */
@@ -109,12 +121,10 @@ const ZyrUpload = ({
   fileList = [],
   action,
   data,
+  method = "post",
+  headers,
   disabled = false,
-  // showUploadList = {
-  //   showPreviewIcon: true,
-  //   showRemoveIcon: true,
-  //   showDownloadIcon: true,
-  // },
+  showUploadList,
   beforeUpload,
   onRemove,
   onChange,
@@ -150,11 +160,14 @@ const ZyrUpload = ({
 
   // 上传前校验
   const beforeUploadHandle = (file) => {
-    if (file.size > maxSize * 1024 * 1024 && file.type.includes("image/")) {
-      message.error(`上传图片超过${maxSize}M大小限制，请重新上传`);
-      return Upload.LIST_IGNORE;
-    }
-    return true; //beforeUpload(file)
+    const defaultBeforeUpload = (file) => {
+      if (file.size > maxSize * 1024 * 1024) {
+        message.error(`文件大小不能超过${maxSize}M`);
+        return Upload.LIST_IGNORE;
+      }
+      return true;
+    };
+    return beforeUpload ? beforeUpload(file) : defaultBeforeUpload(file);
   };
 
   // 监听粘贴事件
@@ -241,25 +254,28 @@ const ZyrUpload = ({
       });
     }
     formData.append("file", option.file);
-    axios
-      .post(action, formData, {
-        onUploadProgress: (res) => {
-          const { total, loaded } = res;
-          const number = Number(Math.round((loaded / total) * 100).toFixed(2));
-          const targetFile = {
-            ...getFileObj(option.file),
-            percent: number,
-            status: "uploading",
-          };
-          option.onUploadProgress &&
-            option.onUploadProgress(
-              {
-                percent: number,
-              },
-              targetFile
-            );
-        },
-      })
+    axios({
+      method: method,
+      url: action,
+      data: formData,
+      headers: headers ? { ...headers } : {},
+      onUploadProgress: (res) => {
+        const { total, loaded } = res;
+        const number = Number(Math.round((loaded / total) * 100).toFixed(2));
+        const targetFile = {
+          ...getFileObj(option.file),
+          percent: number,
+          status: "uploading",
+        };
+        option.onUploadProgress &&
+          option.onUploadProgress(
+            {
+              percent: number,
+            },
+            targetFile
+          );
+      },
+    })
       .then((res) => {
         const { data } = res.data;
         const tragetFile = {
@@ -322,10 +338,10 @@ const ZyrUpload = ({
     accept,
     multiple,
     directory,
-    data,
     disabled,
     listType,
     fileList,
+    showUploadList,
   };
 
   return isDrag ? (
