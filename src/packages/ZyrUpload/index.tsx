@@ -6,6 +6,7 @@ import type { UploadFile, UploadProps } from "antd";
 import { PlusOutlined, UploadOutlined, InboxOutlined } from "@ant-design/icons";
 // import "../../style/icon.less";
 import axios from "axios";
+import { UploadRequestOption } from "../../types/upload";
 
 export type UploadRequestMethod =
   | "POST"
@@ -75,7 +76,7 @@ export interface ZyrUploadProps {
   /**
    * 通过覆盖默认的上传行为，可以自定义自己的上传实现
    */
-  customRequest?: () => void;
+  customRequest?: (option: UploadRequestOption) => void;
   /**
    *是否展示文件列表, 可设为一个对象，用于单独设定 showPreviewIcon, showRemoveIcon, showDownloadIcon, removeIcon 和 downloadIcon
    */
@@ -123,6 +124,7 @@ const ZyrUpload = ({
   data,
   method = "post",
   headers,
+  customRequest,
   disabled = false,
   showUploadList,
   beforeUpload,
@@ -245,7 +247,7 @@ const ZyrUpload = ({
     }
     return nextFileList;
   };
-  // 自定义上传
+  // 为了兼容剪贴事件，重写上传方法作为默认上传方法
   const uploadFile = (option) => {
     const formData = new FormData();
     if (option.data) {
@@ -301,6 +303,11 @@ const ZyrUpload = ({
     };
   };
 
+  // 用户自定义上传
+  const cusUpload = (option: UploadRequestOption) => {
+    return customRequest(option);
+  };
+
   // 拖拽默认展示样式
   const defaultDragRender = (
     <>
@@ -348,7 +355,7 @@ const ZyrUpload = ({
     <Upload.Dragger
       {...defaultProps}
       fileList={list}
-      customRequest={uploadFile}
+      customRequest={customRequest ? cusUpload : uploadFile}
       beforeUpload={beforeUploadHandle}
       onRemove={removeHandle}
       onChange={changeHandle}
@@ -359,7 +366,7 @@ const ZyrUpload = ({
     <Upload
       {...defaultProps}
       fileList={list}
-      customRequest={uploadFile}
+      customRequest={customRequest ? cusUpload : uploadFile}
       beforeUpload={beforeUploadHandle}
       onRemove={removeHandle}
       onChange={changeHandle}
