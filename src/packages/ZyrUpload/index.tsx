@@ -303,11 +303,6 @@ const ZyrUpload = ({
     };
   };
 
-  // 用户自定义上传
-  const cusUpload = (option: UploadRequestOption) => {
-    return customRequest(option);
-  };
-
   // 拖拽默认展示样式
   const defaultDragRender = (
     <>
@@ -355,7 +350,7 @@ const ZyrUpload = ({
     <Upload.Dragger
       {...defaultProps}
       fileList={list}
-      customRequest={customRequest ? cusUpload : uploadFile}
+      customRequest={customRequest || uploadFile}
       beforeUpload={beforeUploadHandle}
       onRemove={removeHandle}
       onChange={changeHandle}
@@ -366,7 +361,7 @@ const ZyrUpload = ({
     <Upload
       {...defaultProps}
       fileList={list}
-      customRequest={customRequest ? cusUpload : uploadFile}
+      customRequest={customRequest || uploadFile}
       beforeUpload={beforeUploadHandle}
       onRemove={removeHandle}
       onChange={changeHandle}
