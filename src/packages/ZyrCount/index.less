@@ -1,0 +1,41 @@
+.zyr-count {
+  display: flex;
+  align-items: center;
+  &__btn {
+    // width: 30px;
+    height: 30px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    user-select: none;
+    &-left {
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+    &-right {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+    &:hover {
+      cursor: pointer;
+      background-color: #f8f7f7;
+    }
+    &--disabled {
+    }
+  }
+  &__input {
+    height: 30px;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-left: none;
+    border-right: none;
+    padding-left: 5px;
+    max-width: 150px;
+    outline: none;
+  }
+  &__unit {
+    margin-left: 3px;
+  }
+}
