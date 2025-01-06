@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { message } from "antd";
 
 const meta: Meta<typeof ZyrUpload> = {
-  title: "Example/ZyrUpload",
+  title: "Form/ZyrUpload",
   component: ZyrUpload,
   tags: ["autodocs"],
 };
@@ -23,7 +23,6 @@ export const Default: Story = {
     isPaste: true,
     disabled: false,
     action: "http://localhost:3000/upload",
-    //'https://test-enterprise-dispatch-api.wanshifu.com/common/uploadFileBatch',
     data: {
       id: uuidv4(),
       //loginMemberId: '12344',
@@ -51,7 +50,6 @@ export const DraggerUpload: Story = {
     action: "http://localhost:3000/upload",
     data: {
       id: uuidv4(),
-      //loginMemberId: '12344',
     },
     onRemove: (file) => {
       message.success("删除了");
