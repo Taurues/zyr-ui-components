@@ -74,6 +74,7 @@ const ZyrTable = ({
   loading = false,
   pagination = initPagination,
 }: ZyrTableProps) => {
+  // 表头
   const getTableHeader = () => {
     return Object.keys(column).map((key) => {
       const fixStyle: React.CSSProperties = column[key].fixed
@@ -87,6 +88,7 @@ const ZyrTable = ({
     });
   };
 
+  // table body 数据展示
   const getTableBodyRow = () => {
     return dataSource.map((item, index) => {
       return (
@@ -100,6 +102,7 @@ const ZyrTable = ({
           }
         >
           <tr className={cn(bem.e("empty"))}></tr>
+          {/* 额外列配置 */}
           <tr className={cn(bem.e("extra"))}>
             <td colSpan={Object.keys(column).length}>
               {typeof extraColumn === "function"

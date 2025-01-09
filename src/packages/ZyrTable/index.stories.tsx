@@ -62,7 +62,7 @@ export const DefaultTable: Story = {
 };
 
 /**
- * 固定列
+ * 固定列:  fix定位只对表头和表格列生效，extraColumn中的内容不受fix属性控制，如果需要固定extraColumn中的内容，需要在dom自行处理样式，一下例子就是在extraColumn中固定定位
  */
 export const FixedTable: Story = {
   args: {
@@ -70,6 +70,7 @@ export const FixedTable: Story = {
       name1: {
         key: "name1",
         title: "第1列",
+        fixed: "left",
       },
       name2: {
         key: "name2",
@@ -104,7 +105,20 @@ export const FixedTable: Story = {
       },
     },
     extraColumn: (val) => {
-      return <div style={{ color: "green" }}>name1字段值：{val.name1}</div>;
+      return (
+        <div
+          style={{
+            color: "green",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>name1字段值：{val.name1}</div>
+          <div style={{ position: "sticky", right: 10 }}>
+            <SettingOutlined />
+          </div>
+        </div>
+      );
     },
     dataSource: [
       {
