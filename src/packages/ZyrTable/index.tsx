@@ -114,7 +114,17 @@ const ZyrTable = ({
     if (rowSelection) {
       const selectColumn = {
         checkbox: {
-          title: <Checkbox>{rowSelection.columnTitle}</Checkbox>,
+          title: (
+            <Checkbox
+              onChange={(e) => {
+                const checked = e.target.checked;
+                rowSelection.onSelectAll &&
+                  rowSelection.onSelectAll(checked, dataSource, []);
+              }}
+            >
+              {rowSelection.columnTitle}
+            </Checkbox>
+          ),
           key: "checkbox",
           fixed: rowSelection.fixed ? "left" : "",
           cellStyle: { width: rowSelection.columnWidth || 20 },
