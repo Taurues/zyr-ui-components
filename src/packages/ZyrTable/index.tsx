@@ -188,6 +188,13 @@ const ZyrTable = ({
                 {rowSelection && (
                   <Checkbox
                     style={{ marginRight: 8 }}
+                    checked={selectKeys.includes(
+                      rowKey
+                        ? typeof rowKey === "function"
+                          ? rowKey(item)
+                          : item[rowKey]
+                        : index
+                    )}
                     onChange={(e) => {
                       const sl = [...selectKeys];
                       if (e.target.checked) {
