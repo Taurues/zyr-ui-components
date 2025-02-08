@@ -62,7 +62,7 @@ export const DefaultTable: Story = {
 };
 
 /**
- * 固定列: fix定位只对表头和表格列生效，extraColumn中的内容不受fix属性控制，如果需要固定extraColumn中的内容，需要在dom自行处理样式，一下例子就是在extraColumn中固定定位
+ * 固定列: fix定位只对表头和表格列生效，extraColumn中的内容不受fix属性控制，如果需要固定extraColumn中的内容，需要在dom自行处理样式，下面这个例子就是在extraColumn中固定定位
  */
 export const FixedTable: Story = {
   args: {
@@ -179,10 +179,11 @@ export const SelectTable: Story = {
       return <div style={{ color: "green" }}>name1字段值：{val.name1}</div>;
     },
     dataSource: [
-      { name1: "1", name2: "2", name3: "3", name4: "4" },
-      { name1: "11", name2: "22", name3: "33", name4: "44" },
-      { name1: "111", name2: "222", name3: "333", name4: "444" },
+      { name1: "1", name2: "2", name3: "3", name4: "4", id: "1" },
+      { name1: "11", name2: "22", name3: "33", name4: "44", id: "2" },
+      { name1: "111", name2: "222", name3: "333", name4: "444", id: "3" },
     ],
+    rowKey: "id",
     pagination: false,
     rowSelection: {
       selectedRowKeys: [],

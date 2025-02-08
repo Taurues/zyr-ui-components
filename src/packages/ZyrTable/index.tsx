@@ -21,6 +21,10 @@ type ColumnProps<T> = {
 
 type RowSelectionProps = {
   /**
+   * 指定使用哪个属性作为选中数据集合， 默认为table的rowKey
+   */
+  key?: string;
+  /**
    * 隐藏全选勾选框
    */
   hideSelectAll?: boolean;
@@ -37,6 +41,10 @@ type RowSelectionProps = {
    */
   fixed?: boolean;
   /**
+   * checkbox是否可选
+   */
+  getDisabledCheckbox?: (record: any) => boolean;
+  /**
    * 指定选中项的 key 数组，需要和 onChange 进行配合
    */
   selectedRowKeys: any[];
@@ -47,7 +55,7 @@ type RowSelectionProps = {
   /**
    * 用户手动选择/取消选择某行的回调
    */
-  onSelect?: (record: object, selected: boolean, selectedRows: any[]) => void;
+  onSelect?: (selected: boolean, record: object, selectedRows: any[]) => void;
   /**
    * 用户手动选择/取消选择所有行的回调
    */
@@ -109,34 +117,12 @@ const ZyrTable = ({
   rowSelection = false,
 }: ZyrTableProps<typeof column>) => {
   const [customerColumn, setCustomerColumn] = useState(cloneDeep(column));
-
-  useEffect(() => {
-    if (rowSelection) {
-      const selectColumn = {
-        checkbox: {
-          title: (
-            <Checkbox
-              onChange={(e) => {
-                const checked = e.target.checked;
-                rowSelection.onSelectAll &&
-                  rowSelection.onSelectAll(checked, dataSource, []);
-              }}
-            >
-              {rowSelection.columnTitle}
-            </Checkbox>
-          ),
-          key: "checkbox",
-          fixed: rowSelection.fixed ? "left" : "",
-          cellStyle: { width: rowSelection.columnWidth || 20 },
-          headerStyle: { width: rowSelection.columnWidth || 20 },
-          render: (val, record, index) => {
-            return <Checkbox />;
-          },
-        },
-      };
-      setCustomerColumn({ ...selectColumn, ...customerColumn });
-    }
-  }, []);
+  // 多选框是否全部选中
+  const [checkAll, setCheckAll] = useState<boolean>(false);
+  // 半选中样式
+  const [indeterminate, setIndeterminate] = useState<boolean>(false);
+  // 选中的数据
+  const [selectKeys, setSelectKeys] = useState<any[]>([]);
 
   // 表头
   const getTableHeader = () => {
@@ -149,6 +135,31 @@ const ZyrTable = ({
           key={key}
           style={{ ...customerColumn[key].headerStyle, ...fixStyle }}
         >
+          {!!rowSelection && index === 0 && (
+            <Checkbox
+              checked={checkAll}
+              indeterminate={indeterminate}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setIndeterminate(false);
+                setCheckAll(checked);
+                setSelectKeys(
+                  checked
+                    ? dataSource.map((t, i) =>
+                        rowKey
+                          ? typeof rowKey === "function"
+                            ? rowKey(t)
+                            : t[rowKey]
+                          : i
+                      )
+                    : []
+                );
+              }}
+              style={{ marginRight: 8 }}
+            >
+              {rowSelection.columnTitle}
+            </Checkbox>
+          )}
           {customerColumn[key].title}
         </th>
       );
@@ -156,6 +167,7 @@ const ZyrTable = ({
   };
 
   // table body 数据展示
+
   const getTableBodyRow = () => {
     return dataSource.map((item, index) => {
       return (
@@ -172,9 +184,46 @@ const ZyrTable = ({
           {/* 额外列配置 */}
           <tr className={cn(bem.e("extra"))}>
             <td colSpan={Object.keys(customerColumn).length}>
-              {typeof extraColumn === "function"
-                ? extraColumn(item)
-                : extraColumn}
+              <div style={{ display: "flex" }}>
+                {rowSelection && (
+                  <Checkbox
+                    style={{ marginRight: 8 }}
+                    onChange={(e) => {
+                      const sl = [...selectKeys];
+                      if (e.target.checked) {
+                        sl.push(
+                          rowKey
+                            ? typeof rowKey === "function"
+                              ? rowKey(item)
+                              : item[rowKey]
+                            : index
+                        );
+                      } else {
+                        sl.splice(
+                          sl.findIndex(
+                            (item) =>
+                              item ===
+                              (rowKey
+                                ? typeof rowKey === "function"
+                                  ? rowKey(item)
+                                  : item[rowKey]
+                                : index)
+                          )
+                        );
+                      }
+                      setSelectKeys(sl);
+                      console.log("sl :>> ", sl);
+                      setIndeterminate(
+                        !!sl.length && sl.length < dataSource.length
+                      );
+                      setCheckAll(sl.length === dataSource.length);
+                    }}
+                  />
+                )}
+                {typeof extraColumn === "function"
+                  ? extraColumn(item)
+                  : extraColumn}
+              </div>
             </td>
           </tr>
           <tr>
